@@ -43,13 +43,18 @@ const Calculator = () => {
             } else {
                 refundAmount = 0;
             }
-        } else if (ticketStatus === 'RAC' || ticketStatus === 'WL') {
+        } else if (ticketStatus === 'RAC') {
             if (cancellationTime !== "Between 30min-0min") {
                 refundAmount = fareValue - 60 * passenger;
             } else {
-                refundAmount = 0;
+                refundAmount = "You need to file TDR";
             }
-        } else if (ticketStatus === 'Tatkal Confirmed') {
+        }
+        else if (ticketStatus === 'WL') {
+            refundAmount = fareValue - 60 * passenger;
+
+        }
+        else if (ticketStatus === 'Tatkal Confirmed') {
             refundAmount = 0;
         } else if (ticketStatus === 'Tatkal Waitlist') {
             if (cancellationTime !== "Between 30min-0min") {
@@ -63,8 +68,8 @@ const Calculator = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center sm:justify-start sm:pl-20 bg-gray-200 tracking-wide sm:py-8 bg-cover bg-center sm:bg-vandebharat">
-            <section className="calculator-form p-8 bg-white rounded-lg shadow-lg w-full max-w-md " >
+        <div className="min-h-screen flex items-center justify-center sm:justify-start sm:pl-20 bg-white tracking-wide sm:py-8 bg-cover bg-center sm:bg-vandebharat">
+            <section className="calculator-form p-4 bg-white rounded-lg sm:shadow-lg w-full max-w-md " >
                 <h1 className="text-2xl font-semibold text-center mb-6">Refund Calculator</h1>
                 <form
                     onSubmit={calculateRefund}
@@ -157,7 +162,10 @@ const Calculator = () => {
 
                 {refund !== null && (
                     <div className="mt-3 text-center">
-                        <h2 className="text-2xl font-semibold">Refund Amount: ₹{refund.toFixed(2)}</h2>
+                        <h2 className="text-2xl font-semibold">
+                            {typeof refund === 'number' ? `Refund Amount: ₹${refund.toFixed(2)} - GST` : refund}
+                        </h2>
+
                     </div>
                 )}
             </section>
