@@ -4,7 +4,7 @@ module.exports = {
   theme: {
     extend: {
       backgroundImage: {
-        vandebharat: "url('vandebharat2.jpg')",
+        vandebharat: "url('/vandebharat2.jpg')",
       },
     },
   },
