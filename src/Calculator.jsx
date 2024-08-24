@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import vandebharat from '/vandebharat2.jpg';
-
 
 const Calculator = () => {
     const [fare, setFare] = useState('');
     const [classType, setClassType] = useState('AC 3 Tier');
-    const [cancellationTime, setCancellationTime] = useState("Before 48hrs");
+    const [cancellationTime, setCancellationTime] = useState('');
     const [passenger, setPassenger] = useState(1);
     const [ticketStatus, setTicketStatus] = useState('Confirmed');
     const [refund, setRefund] = useState(null);
@@ -20,6 +18,28 @@ const Calculator = () => {
         'AC 3 Economy': 180,
         'Sleeper Class': 120,
         'Second Class': 60,
+    };
+
+    const cancellationOptions = {
+        'Confirmed': [
+            "Before 48hrs",
+            "Between 48hrs-12hrs",
+            "Between 12hrs-4hrs",
+            "Between 4hrs-0min"
+        ],
+        'RAC': [
+            "Before 30min",
+            "Between 30min-0min"
+        ],
+        'WL': [
+            "Any time",
+        ],
+        'Tatkal Confirmed': [
+            "Any time"
+        ],
+        'Tatkal Waitlist': [
+            "Any time"
+        ],
     };
 
     const calculateRefund = (e) => {
@@ -49,19 +69,12 @@ const Calculator = () => {
             } else {
                 refundAmount = "You need to file TDR";
             }
-        }
-        else if (ticketStatus === 'WL') {
+        } else if (ticketStatus === 'WL') {
             refundAmount = fareValue - 60 * passenger;
-
-        }
-        else if (ticketStatus === 'Tatkal Confirmed') {
+        } else if (ticketStatus === 'Tatkal Confirmed') {
             refundAmount = 0;
         } else if (ticketStatus === 'Tatkal Waitlist') {
-            if (cancellationTime !== "Between 30min-0min") {
-                refundAmount = fareValue - 60 * passenger;
-            } else {
-                refundAmount = 0;
-            }
+            refundAmount = fareValue - 60 * passenger;
         }
 
         setRefund(refundAmount);
@@ -69,18 +82,21 @@ const Calculator = () => {
 
     return (
         <div className="min-h-screen flex items-center justify-center sm:justify-start sm:pl-20 bg-white tracking-wide sm:py-8 bg-cover bg-center sm:bg-vandebharat">
-            <section className="calculator-form p-4 bg-white rounded-lg sm:shadow-lg w-full max-w-md " >
+            <section className="calculator-form p-4 bg-white rounded-lg sm:shadow-lg w-full max-w-md min-h-[39rem]" >
                 <h1 className="text-2xl font-semibold text-center mb-6">Refund Calculator</h1>
                 <form
                     onSubmit={calculateRefund}
-                    className="flex flex-col text-md"
+                    className="flex flex-col text-md "
                 >
                     <label htmlFor="ticketStatus" className="font-medium">Ticket Status:</label>
                     <select
                         id="ticketStatus"
                         name="ticketStatus"
                         value={ticketStatus}
-                        onChange={(e) => setTicketStatus(e.target.value)}
+                        onChange={(e) => {
+                            setTicketStatus(e.target.value);
+                            setCancellationTime('');
+                        }}
                         className="p-2 rounded  focus:border-blue-500 border-2 border-solid border-gray-400"
                         required
                     >
@@ -91,7 +107,7 @@ const Calculator = () => {
                         <option value="Tatkal Waitlist">Tatkal Waitlist (TQWL)</option>
                     </select>
 
-                    <label htmlFor="cancellationTime" className="font-medium mt-4">Cancellation Time:</label>
+                    <label htmlFor="cancellationTime" className="font-medium mt-4">Cancellation Time: </label>
                     <select
                         id="cancellationTime"
                         name="cancellationTime"
@@ -100,32 +116,45 @@ const Calculator = () => {
                         className="p-2 rounded  focus:border-blue-500 border-2 border-solid border-gray-400"
                         required
                     >
-                        <option value="Before 48hrs">Before 48hrs</option>
-                        <option value="Between 48hrs-12hrs">Between 48hrs-12hrs</option>
-                        <option value="Between 12hrs-4hrs">Between 12hrs-4hrs</option>
-                        <option value="Between 4hrs-30min">Between 4hrs-30min</option>
-                        <option value="Between 30min-0min">Between 30min-0min</option>
+                        <option value="" disabled>Select Cancellation Time</option>
+                        {cancellationOptions[ticketStatus].map((option) => (
+                            <option key={option} value={option}>
+                                {option}
+                            </option>
+                        ))}
                     </select>
 
-                    <label htmlFor="classType" className="font-medium mt-4">Select Class Type:</label>
-                    <select
-                        id="classType"
-                        name="classType"
-                        value={classType}
-                        onChange={(e) => setClassType(e.target.value)}
-                        className="p-2 rounded focus:border-blue-500 border-2 border-solid border-gray-400"
-                        required
-                    >
-                        <option value="AC First Class">AC First Class</option>
-                        <option value="Executive Class">Executive Class</option>
-                        <option value="AC 2 Tier">AC 2 Tier</option>
-                        <option value="First Class">First Class</option>
-                        <option value="AC 3 Tier">AC 3 Tier</option>
-                        <option value="AC Chair Car">AC Chair Car</option>
-                        <option value="AC 3 Economy">AC 3 Economy</option>
-                        <option value="Sleeper Class">Sleeper Class</option>
-                        <option value="Second Class">Second Class</option>
-                    </select>
+                    <label htmlFor="classType" className="font-medium mt-4">Class Type:</label>
+                    {
+                        ticketStatus === 'Confirmed' ? (
+                            <select
+                                id="classType"
+                                name="classType"
+                                value={classType}
+                                onChange={(e) => setClassType(e.target.value)}
+                                className="p-2 rounded focus:border-blue-500 border-2 border-solid border-gray-400"
+                                required
+                            >
+                                <option value="AC First Class">AC First Class</option>
+                                <option value="Executive Class">Executive Class</option>
+                                <option value="AC 2 Tier">AC 2 Tier</option>
+                                <option value="First Class">First Class</option>
+                                <option value="AC 3 Tier">AC 3 Tier</option>
+                                <option value="AC Chair Car">AC Chair Car</option>
+                                <option value="AC 3 Economy">AC 3 Economy</option>
+                                <option value="Sleeper Class">Sleeper Class</option>
+                                <option value="Second Class">Second Class</option>
+                            </select>
+                        ) : (
+                            <input
+                                id="classType"
+                                name="classType"
+                                value="Any"
+                                readOnly
+                                className="p-2 rounded focus:border-blue-500 border-2 border-solid border-gray-400"
+                            />
+                        )
+                    }
 
                     <label htmlFor="passenger" className="font-medium mt-4">No. of Passenger:</label>
                     <input
@@ -133,11 +162,12 @@ const Calculator = () => {
                         id="passenger"
                         name="passenger"
                         value={passenger}
-                        min={0}
+                        min={1}
                         onChange={(e) => setPassenger(e.target.value)}
                         className="p-2 rounded focus:border-blue-500 border-2 border-solid border-gray-400"
                         required
                     />
+
                     <label htmlFor="fare" className="font-medium mt-4">Enter Ticket Fare (₹):</label>
                     <input
                         type="number"
@@ -153,7 +183,7 @@ const Calculator = () => {
                     <div className='flex justify-center'>
                         <button
                             type="submit"
-                            className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition duration-300 px-4 sm:w-1/2 mt-8"
+                            className="bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300 px-4 sm:w-1/2 mt-4"
                         >
                             Calculate Refund
                         </button>
@@ -161,13 +191,15 @@ const Calculator = () => {
                 </form>
 
                 {refund !== null && (
-                    <div className="mt-3 text-center">
+                    <div className="mt-4 text-center">
                         <h2 className="text-2xl font-semibold">
-                            {typeof refund === 'number' ? `Refund Amount: ₹${refund.toFixed(2)} - GST` : refund}
+                            {refund === 0 ? `Refund Amount: ₹0` : typeof refund === 'number' ? `Refund Amount: ₹${refund.toFixed(2)} - GST` : refund}
                         </h2>
-
                     </div>
                 )}
+
+                <div className='text-center mt-3'>For more details, <a className="text-blue-500 hover:underline" href="https://contents.irctc.co.in/en/eticketCancel.html" >Click here</a>.
+                </div>
             </section>
         </div>
     );
